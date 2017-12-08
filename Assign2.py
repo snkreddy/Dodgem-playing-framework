@@ -20,8 +20,9 @@ if __name__=='__main__':
 
     board = Board(size=5) #Board object
      # Random player
-    player_1 =MyPlayer() # MyPlayer
-    player_2 = MyPlayer()
+    player_1 = OtherPlayer()
+    player_2 =MyPlayer() # MyPlayer
+
     game = Game(board,player_1,player_2)
 
     while (game.step()==0):

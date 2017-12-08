@@ -24,6 +24,9 @@ class MyPlayer(Player):
         if board.turn==2:
             moves = board.get_valid_moves()
             cou=0
+            # for it in moves:
+            #     print(it,cou)
+            #     cou+=1
             board_matrix,turn = board.get_board_config()
             x1=0
             if len(moves)>2:
@@ -43,13 +46,17 @@ class MyPlayer(Player):
                 clones[i]=copy.deepcopy(board)
                 board_parent=copy.deepcopy(board)
                 moves=clones[i].get_valid_moves()
+
+                # print(moves)
+                # moves.sort(key=second,reverse=True)
                 clones[i].make_move(moves[i])
+                # print(board_matrix)
                 mat,turn=clones[i].get_board_config()
                 # print(mat)
 
                 mov_exact=moves_exact[i]
                 k=MINIMAX(2,clones[i],1,board_parent,mov_exact,x1)
-
+                # print("the value of K =",k)
                 if(max<=k):#big problem
                     max=k
                     j=i
@@ -58,6 +65,10 @@ class MyPlayer(Player):
             moves = board.get_valid_moves()
             # print( time.time()-t1)
             return moves[j]
+
+
+
+
 
 
         if board.turn==1:
@@ -86,14 +97,18 @@ class MyPlayer(Player):
                 board_parent=copy.deepcopy(board)
                 moves=clones[i].get_valid_moves()
 
+                # print(moves)
+                # moves.sort(key=second3,reverse=True)
                 clones[i].make_move(moves[i])
                 # print(board_matrix)
                 mat,turn=clones[i].get_board_config()
                 # print(mat)
 
                 mov_exact=moves_exact[i]
+                # print(x1)
+                # x1=3
                 k=MINIMAX1(2,clones[i],1,board_parent,mov_exact,x1)
-
+                # print("the value of K =",k)
                 if(max<k):#big problem
                     max=k
                     j=i
@@ -103,6 +118,16 @@ class MyPlayer(Player):
             # print( time.time()-t1)
             return moves[j]
 
+
+#
+# def second3(ele):
+#     return ele[1][0]+ele[1][1]
+
+def second(elem):
+    return elem[1][0]
+
+def second1(elem):
+    return elem[1][1]
 
 
 def h(board_matrix,board_parent,mov_exact):
@@ -122,12 +147,15 @@ def h(board_matrix,board_parent,mov_exact):
     elif j2>j1:
         h=1000
 
+
+
     i=0
     for m in board_matrix:
         j=0
         for p in m:
             if p==2:
                 h=h+(i)*100
+
         i=i+1
 
     o=0
@@ -136,6 +164,7 @@ def h(board_matrix,board_parent,mov_exact):
         for p in m:
             if p==2:
                 o=o+1
+
 
     o=len(board_matrix)-1-o
     o=o*5000
@@ -161,6 +190,8 @@ def h1(board_matrix,board_parent,mov_exact):
         h=1000
 
     i=0
+
+
     for m in board_matrix:
         j=0
         for p in m:
@@ -168,6 +199,7 @@ def h1(board_matrix,board_parent,mov_exact):
             if p==1:
                 h=h+(j)*100
             j=j+1
+
 
     o=0
     for m in board_matrix:
@@ -179,17 +211,22 @@ def h1(board_matrix,board_parent,mov_exact):
     o=len(board_matrix)-1-o
     o=o*5000
 
+
     return h+o
 
 
 
-def MINIMAX(board,depth,board_parent,mov_exact,x):
 
-    if depth==x:
+
+
+
+def MINIMAX(type,board,depth,board_parent,mov_exact,x):
+
+    if depth==1:
         board_matrix,turn = board.get_board_config()
         return h(board_matrix,board_parent,mov_exact)
 
-    else:
+    if(type==1):
         max=0
         clones=[0 for mov in board.get_valid_moves()]
         i=0
@@ -198,23 +235,42 @@ def MINIMAX(board,depth,board_parent,mov_exact,x):
             clones[i]=copy.deepcopy(board)
             board_parent=copy.deepcopy(board)
             moves=clones[i].get_valid_moves()
+            # moves.sort(key=second,reverse=True)
             clones[i].make_move(moves[i])
             mov_exact=moves_exact[i]
-            k=MINIMAX(clones[i],depth+1,board_parent,mov_exact,x)
+            k=MINIMAX(2,clones[i],depth+1,board_parent,mov_exact,x)
             if(max<=k):
                 max=k
             i=i+1
+        return max
+
+    if(type==2):
+        min=0
+        clones=[0 for mov in board.get_valid_moves()]
+        i=0
+        moves_exact = board.get_valid_moves()
+        for mov in board.get_valid_moves():
+            clones[i]=copy.deepcopy(board)
+            board_parent=copy.deepcopy(board)
+            moves=clones[i].get_valid_moves()
+            # moves.sort(key=second,reverse=True)
+            clones[i].make_move(moves[i])
+            mov_exact=moves_exact[i]
+            k=MINIMAX(1,clones[i],depth+1,board_parent,mov_exact,x)
+            if(min<=k):
+                min=k
+            i=i+1
+        return min
 
 
-
-def MINIMAX1(board,depth,board_parent,mov_exact,x):
+def MINIMAX1(type,board,depth,board_parent,mov_exact,x):
 
     if depth==x:
         board_matrix,turn = board.get_board_config()
         # print(mov_exact)
         return h1(board_matrix,board_parent,mov_exact)
 
-    else:
+    if(type==1):
         max=0
         clones=[0 for mov in board.get_valid_moves()]
         i=0
@@ -222,11 +278,31 @@ def MINIMAX1(board,depth,board_parent,mov_exact,x):
         for mov in board.get_valid_moves():
             clones[i]=copy.deepcopy(board)
             board_parent=copy.deepcopy(board)
+            moves=clones[i].get_valid_moves()
+            # moves.sort(key=second,reverse=True)
             clones[i].make_move(moves[i])
             mov_exact=moves_exact[i]
-            k=MINIMAX1(clones[i],depth+1,board_parent,mov_exact,x)
+            k=MINIMAX1(2,clones[i],depth+1,board_parent,mov_exact,x)
             # print(k)
             if(max<=k):
                 max=k
             i=i+1
         return max
+
+    if(type==2):
+        min=0
+        clones=[0 for mov in board.get_valid_moves()]
+        i=0
+        moves_exact = board.get_valid_moves()
+        for mov in board.get_valid_moves():
+            clones[i]=copy.deepcopy(board)
+            board_parent=copy.deepcopy(board)
+            moves=clones[i].get_valid_moves()
+            # moves.sort(key=second,reverse=True)
+            clones[i].make_move(moves[i])
+            mov_exact=moves_exact[i]
+            k=MINIMAX1(1,clones[i],depth+1,board_parent,mov_exact,x)
+            if(min<=k):
+                min=k
+            i=i+1
+        return min
